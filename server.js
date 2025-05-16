@@ -43,6 +43,7 @@ app.post("/trm", async (req, res) => {
 
     res.setHeader("Content-Disposition", `attachment; filename="TRM_${fechaInicio}_a_${fechaFin}.xlsx"`);
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Cache-Control", "no-store");
     res.send(buffer);
 });
 

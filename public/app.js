@@ -13,7 +13,7 @@ async function consultarTRM() {
     return;
   }
 
-  let response = await fetch("/trm", {
+  let response = await fetch("https://trm-acema-5vmslahie-acemas-projects-622f8fd5.vercel.app/trm", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fechaInicio, fechaFin }),
@@ -23,7 +23,7 @@ async function consultarTRM() {
 
   if (data.archivo) {
     let link = document.createElement("a");
-    link.href = data.archivo;
+    link.href = "https://trm-acema-5vmslahie-acemas-projects-622f8fd5.vercel.app" + data.archivo;
     link.download = `TRM_${fechaInicio}_a_${fechaFin}.xlsx`;
     document.body.appendChild(link);
     link.click();
@@ -33,38 +33,6 @@ async function consultarTRM() {
     limpiarCampos();
   } else {
     mostrarMensaje("❌ Hubo un error al generar el archivo.");
-  }
-}
-
-async function consultarTRMMes() {
-  let hoy = new Date();
-  let anio = hoy.getFullYear();
-  let mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
-  let diaActual = hoy.getDate();
-
-  let fechaInicio = `${anio}-${mes}-01`;
-  let fechaFin = `${anio}-${mes}-${diaActual}`;
-
-  let response = await fetch("/trm", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fechaInicio, fechaFin }),
-  });
-
-  let data = await response.json();
-
-  if (data.archivo) {
-    let link = document.createElement("a");
-    link.href = data.archivo;
-    link.download = `TRM_Mensual_${mes}_${anio}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    mostrarMensaje("✅ Archivo mensual descargado exitosamente.");
-    limpiarCampos();
-  } else {
-    mostrarMensaje("❌ Error al generar el reporte mensual.");
   }
 }
 
