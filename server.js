@@ -2,8 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const xlsx = require("xlsx");
-const fs = require("fs");
-const { subirArchivo } = require("./Auth/googleDrive");
+const { subirArchivoBuffer } = require("./Auth/googleDrive");
 
 const app = express();
 app.use(cors());
@@ -35,13 +34,11 @@ app.post("/trm", async (req, res) => {
     xlsx.utils.book_append_sheet(libro, hoja, "TRM Rango");
 
     const fileName = `TRM_${fechaInicio}_a_${fechaFin}.xlsx`;
-    const filePath = fileName;
-    xlsx.writeFile(libro, filePath);
+    const buffer = xlsx.write(libro, { type: "buffer", bookType: "xlsx" });
 
     try {
-        const fileUrl = await subirArchivo(filePath, fileName);
+        const fileUrl = await subirArchivoBuffer(buffer, fileName);
         if (!fileUrl) throw new Error("❌ Error al subir el archivo a Google Drive.");
-        fs.unlinkSync(filePath);
         res.json({ mensaje: "✅ Archivo subido exitosamente.", fileUrl });
     } catch (error) {
         console.error(error.message);
@@ -49,4 +46,5 @@ app.post("/trm", async (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log("🚀 Servidor corriendo en https://trm-acema.vercel.app/"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));

@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
+const { Readable } = require("stream");
 require("dotenv").config();
-const fs = require("fs");
 
 const auth = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -12,21 +12,20 @@ auth.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 const drive = google.drive({ version: "v3", auth });
 
-async function subirArchivo(filePath, fileName) {
+async function subirArchivoBuffer(buffer, fileName) {
     try {
+        const stream = Readable.from(buffer);
+
         const response = await drive.files.create({
             requestBody: {
                 name: fileName,
                 mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             },
-            media: { body: fs.createReadStream(filePath) },
+            media: { body: stream },
         });
-
-        console.log("✅ Archivo subido con éxito:", response.data);
 
         const fileId = response.data.id;
         const publicUrl = await hacerArchivoPublico(fileId);
-
         return publicUrl;
     } catch (error) {
         console.error("❌ Error subiendo archivo:", error.message);
@@ -45,7 +44,6 @@ async function hacerArchivoPublico(fileId) {
         });
 
         const publicUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
-        console.log("✅ Archivo ahora es público:", publicUrl);
         return publicUrl;
     } catch (error) {
         console.error("❌ Error al hacer el archivo público:", error.message);
@@ -53,4 +51,4 @@ async function hacerArchivoPublico(fileId) {
     }
 }
 
-module.exports = { subirArchivo };
+module.exports = { subirArchivoBuffer };
