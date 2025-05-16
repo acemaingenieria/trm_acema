@@ -89,15 +89,13 @@
         <label for="fechaFin">Fecha Fin:</label>
         <input type="date" id="fechaFin" required />
 
-        <button class="btn" onclick="consultarTRM()">📁 Generar Reporte</button>
+        <button id="btnGenerar" class="btn">📁 Generar Reporte</button>
       </div>
 
       <div class="card">
         <h2>Generar TRM Mensual</h2>
         <p>Consulta la TRM desde el inicio del mes hasta hoy.</p>
-        <button class="btn" onclick="consultarTRMMes()">
-          📅 Generar Reporte Mensual
-        </button>
+        <button class="btn" onclick="consultarTRMMes()">📅 Generar Reporte Mensual</button>
       </div>
 
       <p id="mensaje" class="mensaje"></p>

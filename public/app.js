@@ -1,6 +1,17 @@
+// Asegúrate de que el script se está cargando correctamente
+console.log("Script cargado");
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Aseguramos que el evento se ha vinculado correctamente al botón
+    const btnGenerar = document.getElementById("btnGenerar");
+    if (btnGenerar) {
+        btnGenerar.addEventListener("click", consultarTRM);
+    }
+});
+
 async function consultarTRM() {
     console.log("Generando reporte...");
-    
+
     let fechaInicio = document.getElementById("fechaInicio").value;
     let fechaFin = document.getElementById("fechaFin").value;
 
