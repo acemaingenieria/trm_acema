@@ -4,6 +4,7 @@ async function consultarTRM() {
     let hoy = new Date().toISOString().split("T")[0];
 
     console.log("🔄 Botón presionado, iniciando consulta...");
+    console.log("🔄 Fechas seleccionadas:", fechaInicio, fechaFin);
 
     if (!fechaInicio || !fechaFin) {
         mostrarMensaje("⚠️ Ingresa ambas fechas antes de generar el reporte.");
@@ -21,8 +22,7 @@ async function consultarTRM() {
     }
 
     try {
-        console.log("🔄 Enviando solicitud a la API...");
-        let response = await fetch("https://trm-acema.vercel.app/trm", {
+        let response = await fetch("http://localhost:3000/trm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ fechaInicio, fechaFin }),

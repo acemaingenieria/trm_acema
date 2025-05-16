@@ -10,6 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/trm", async (req, res) => {
+    console.log("🔄 Datos recibidos:", req.body);
+
     const { fechaInicio, fechaFin } = req.body;
 
     if (!fechaInicio || !fechaFin) {
@@ -39,6 +41,10 @@ app.post("/trm", async (req, res) => {
         }
     }
 
+    if (datosTRM.length === 0) {
+        return res.status(400).json({ error: "⚠️ No se encontraron datos de TRM para el rango seleccionado." });
+    }
+
     const libro = xlsx.utils.book_new();
     const hoja = xlsx.utils.json_to_sheet(datosTRM);
     xlsx.utils.book_append_sheet(libro, hoja, "TRM Rango");
@@ -49,7 +55,7 @@ app.post("/trm", async (req, res) => {
     try {
         const fileId = await subirArchivo(filePath, filePath);
         if (!fileId) throw new Error("❌ Error al subir el archivo a Google Drive.");
-        fs.unlinkSync(filePath); // Eliminar archivo local solo si se subió correctamente
+        fs.unlinkSync(filePath);
         res.json({ mensaje: "✅ Archivo subido exitosamente.", fileId });
     } catch (error) {
         console.error(error.message);
@@ -57,4 +63,4 @@ app.post("/trm", async (req, res) => {
     }
 });
 
-module.exports = app;
+app.listen(3000, () => console.log("🚀 Servidor corriendo en http://localhost:3000"));
