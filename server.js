@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const xlsx = require("xlsx");
+const fs = require("fs");
+const { subirArchivo } = require("./OAuth/googleDrive");
 
 const app = express();
 app.use(cors());
@@ -16,8 +18,11 @@ app.post("/trm", async (req, res) => {
 
     const startDate = new Date(fechaInicio);
     const endDate = new Date(fechaFin);
-    const datosTRM = [];
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate > endDate) {
+        return res.status(400).json({ error: "⚠️ Las fechas ingresadas no son válidas." });
+    }
 
+    const datosTRM = [];
     console.log(`🔄 Generando TRM desde ${fechaInicio} hasta ${fechaFin}...`);
 
     for (let fecha = startDate; fecha <= endDate; fecha.setDate(fecha.getDate() + 1)) {
@@ -38,13 +43,18 @@ app.post("/trm", async (req, res) => {
     const hoja = xlsx.utils.json_to_sheet(datosTRM);
     xlsx.utils.book_append_sheet(libro, hoja, "TRM Rango");
 
-    const buffer = xlsx.write(libro, { type: "buffer", bookType: "xlsx" });
+    const filePath = `TRM_${fechaInicio}_a_${fechaFin}.xlsx`;
+    xlsx.writeFile(libro, filePath);
 
-    res.setHeader("Content-Disposition", `attachment; filename="TRM_${fechaInicio}_a_${fechaFin}.xlsx"`);
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Cache-Control", "no-store");
-    res.send(buffer);
+    try {
+        const fileId = await subirArchivo(filePath, filePath);
+        if (!fileId) throw new Error("❌ Error al subir el archivo a Google Drive.");
+        fs.unlinkSync(filePath); // Eliminar archivo local solo si se subió correctamente
+        res.json({ mensaje: "✅ Archivo subido exitosamente.", fileId });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: error.message });
+    }
 });
 
-// 📌 EXPORTAMOS LA APLICACIÓN PARA VERCEL (SIN `app.listen(3000)`)
 module.exports = app;
