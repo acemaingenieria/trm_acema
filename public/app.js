@@ -2,7 +2,7 @@ async function consultarTRM() {
     let fechaInicio = document.getElementById("fechaInicio").value;
     let fechaFin = document.getElementById("fechaFin").value;
 
-    let response = await fetch("http://localhost:3000/trm", {
+    let response = await fetch("https://trm-acema.vercel.app/trm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fechaInicio, fechaFin }),
