@@ -1,5 +1,6 @@
 const { google } = require("googleapis");
 require("dotenv").config();
+const fs = require("fs");
 
 const auth = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -12,8 +13,6 @@ auth.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 const drive = google.drive({ version: "v3", auth });
 
 async function subirArchivo(filePath, fileName) {
-  const fs = require("fs");
-
   try {
     const response = await drive.files.create({
       requestBody: { name: fileName, mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
