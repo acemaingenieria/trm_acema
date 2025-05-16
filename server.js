@@ -3,7 +3,7 @@ const cors = require("cors");
 const axios = require("axios");
 const xlsx = require("xlsx");
 const fs = require("fs");
-const { subirArchivo } = require("./OAuth/googleDrive");
+const { subirArchivo } = require("./Auth/googleDrive");
 
 const app = express();
 app.use(cors());

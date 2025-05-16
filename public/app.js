@@ -3,6 +3,8 @@ async function consultarTRM() {
     let fechaFin = document.getElementById("fechaFin").value;
     let hoy = new Date().toISOString().split("T")[0];
 
+    console.log("🔄 Botón presionado, iniciando consulta...");
+
     if (!fechaInicio || !fechaFin) {
         mostrarMensaje("⚠️ Ingresa ambas fechas antes de generar el reporte.");
         return;
@@ -19,6 +21,7 @@ async function consultarTRM() {
     }
 
     try {
+        console.log("🔄 Enviando solicitud a la API...");
         let response = await fetch("https://trm-acema.vercel.app/trm", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -28,6 +31,8 @@ async function consultarTRM() {
         if (!response.ok) throw new Error(`❌ Error en la API: ${response.status} ${response.statusText}`);
 
         let data = await response.json();
+
+        console.log("🔄 ID del archivo en Google Drive:", data.fileId);
 
         if (data.fileId) {
             let link = document.createElement("a");
