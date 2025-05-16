@@ -10,27 +10,16 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/trm", async (req, res) => {
-    console.log("🔄 Datos recibidos:", req.body);
-
     const { fechaInicio, fechaFin } = req.body;
 
     if (!fechaInicio || !fechaFin) {
         return res.status(400).json({ error: "⚠️ Debes ingresar una fecha de inicio y fin." });
     }
 
-    const startDate = new Date(fechaInicio);
-    const endDate = new Date(fechaFin);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()) || startDate > endDate) {
-        return res.status(400).json({ error: "⚠️ Las fechas ingresadas no son válidas." });
-    }
-
     const datosTRM = [];
-    console.log(`🔄 Generando TRM desde ${fechaInicio} hasta ${fechaFin}...`);
-
-    for (let fecha = startDate; fecha <= endDate; fecha.setDate(fecha.getDate() + 1)) {
+    for (let fecha = new Date(fechaInicio); fecha <= new Date(fechaFin); fecha.setDate(fecha.getDate() + 1)) {
         let fechaStr = fecha.toISOString().split("T")[0];
         let url = `https://trm-colombia.vercel.app/?date=${fechaStr}`;
-
         try {
             let response = await axios.get(url);
             if (response.data?.data?.value) {
@@ -41,22 +30,19 @@ app.post("/trm", async (req, res) => {
         }
     }
 
-    if (datosTRM.length === 0) {
-        return res.status(400).json({ error: "⚠️ No se encontraron datos de TRM para el rango seleccionado." });
-    }
-
     const libro = xlsx.utils.book_new();
     const hoja = xlsx.utils.json_to_sheet(datosTRM);
     xlsx.utils.book_append_sheet(libro, hoja, "TRM Rango");
 
-    const filePath = `TRM_${fechaInicio}_a_${fechaFin}.xlsx`;
+    const fileName = `TRM_${fechaInicio}_a_${fechaFin}.xlsx`;
+    const filePath = fileName;
     xlsx.writeFile(libro, filePath);
 
     try {
-        const fileId = await subirArchivo(filePath, filePath);
-        if (!fileId) throw new Error("❌ Error al subir el archivo a Google Drive.");
+        const fileUrl = await subirArchivo(filePath, fileName);
+        if (!fileUrl) throw new Error("❌ Error al subir el archivo a Google Drive.");
         fs.unlinkSync(filePath);
-        res.json({ mensaje: "✅ Archivo subido exitosamente.", fileId });
+        res.json({ mensaje: "✅ Archivo subido exitosamente.", fileUrl });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: error.message });
