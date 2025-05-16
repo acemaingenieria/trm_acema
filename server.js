@@ -7,7 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 📌 Generar TRM sin guardar en disco, solo para descarga directa
 app.post("/trm", async (req, res) => {
     const { fechaInicio, fechaFin } = req.body;
 
@@ -47,5 +46,5 @@ app.post("/trm", async (req, res) => {
     res.send(buffer);
 });
 
-// 📌 En lugar de `listen(3000)`, exportamos la aplicación para Vercel
+// 📌 EXPORTAMOS LA APLICACIÓN PARA VERCEL (SIN `app.listen(3000)`)
 module.exports = app;
